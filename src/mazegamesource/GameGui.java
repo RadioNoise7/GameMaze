@@ -12,7 +12,7 @@ public class GameGui extends JFrame implements ActionListener
 
     public GameGui()
     {
-        super("Maze Game"); //call super to initilize title bar of G.U.I.
+        super("MazeGame"); //call super to initilize title bar of G.U.I.
         cp=getContentPane();
         shagLabel = new JLabel("",new ImageIcon("yeababyyea.jpg"),JLabel.LEFT);//GUI background for initial load
         cp.add(shagLabel);
@@ -124,9 +124,7 @@ public class GameGui extends JFrame implements ActionListener
         }
         else if (e.getActionCommand().equals("New Game"))//new game on the menu bar
         {
-            fl.loadFile("level1.maz");
-            theArc.setExit(fl.ExitXCord(),fl.ExitYCord());
-            loadMatrixGui("newLoad");
+             return; //maybe implent this feature later
         }//end New Game Command
         else if(e.getActionCommand().equals("EnterName"))//Allows user to enter their name for high score
         {
@@ -161,13 +159,12 @@ public class GameGui extends JFrame implements ActionListener
          {       
              remove(newPanel);//remove the previous level's game from the screen
              if(progBarPanel !=null)//remove the progress bar from the gui as long as its already been created.
-             remove(progBarPanel);
+                remove(progBarPanel);
              String[][] temp = fl.getGameMatrix();
              scrapMatrix = new String[fl.getMatrixSizeRow()][fl.getMatrixSizeColumn()];   
              for (int i = 0; i < scrapMatrix.length; i++){
-                for (int j = 0; j < scrapMatrix[i].length; j++){
-                    scrapMatrix[i][j]= temp[i][j];//create a new matrix so we dont have a refrence to another objects matrix!
-              }}//end double for loop
+                 System.arraycopy(temp[i], 0, scrapMatrix[i], 0, scrapMatrix[i].length); //create a new matrix so we dont have a refrence to another objects matrix!
+                }//end matrix copy
              timeCalc = new TimeCalculator();//create the time calculator used to determine how much time each level is given.
              timeCalc.calcTimeforMaze(fl.dimondCount(),fl.getMatrixSizeRow(),fl.getMatrixSizeColumn());//let time calculator know the parameters of the game 
              timeLeft=timeCalc.getMinutes();//get the minutes allowed for the level
@@ -192,19 +189,23 @@ public class GameGui extends JFrame implements ActionListener
             newPanel = new JPanel();
             newPanel.setLayout(new GridLayout(fl.getMatrixSizeRow(),fl.getMatrixSizeColumn()));
             newPanel.addKeyListener( new MyKeyHandler() );
-            newPanel.grabFocus();        
-        }
-          for (int i = 0; i < labelMatrix.length; i++){
-              for (int j = 0; j < labelMatrix[i].length; j++){
-                  labelMatrix[i][j]=  mo=new mazeObject(scrapMatrix[i][j]);//add our maze images into the gui
-              }}//end double for loop
+            newPanel.grabFocus();
+            doMatrixLabels();
+        }}//end loadMatrixGui method
+     
+     public void doMatrixLabels(){
+         for (int i = 0; i < labelMatrix.length; i++) {
+             for (int j = 0; j < labelMatrix[i].length; j++) {
+                 labelMatrix[i][j] = mo = new mazeObject(scrapMatrix[i][j]);//add our maze images into the gui
+             }
+         }//end double for loop
          cp.add(newPanel);
          remove(shagLabel);//remove the constructors initial background
          System.gc();//force java to clean up memory use.
          pack();
-         setVisible (true);
-         newPanel.grabFocus();  
-     }//end loadMatrixGui method
+         setVisible(true);
+         newPanel.grabFocus();
+     }//end doMatrixLabel method
  
     public class mazeObject extends JLabel//inner class for each maze object, aka wall, player etc
     {
@@ -305,4 +306,4 @@ private  Timer timely;
 private TimeKeeper tk;
 private  String playerName;
 private int levelNum=1;
-}//end class  
+}//end class    
